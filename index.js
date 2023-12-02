@@ -97,7 +97,17 @@ function getLearnerData(course, ag, submissions) {
     console.log("assignment group course id:",ag.course_id);
     console.log("course id",course.id);
 
-    const myResult = [];
+
+    let myResult = [];
+    let learnerIDArray = [];
+    for(i in submissions){
+        if (!( learnerIDArray.indexOf(submissions[i].learner_id) !== -1)){
+
+        learnerIDArray.push(submissions[i].learner_id);
+        }
+    }
+    console.log(learnerIDArray);
+    //found ID's belonging to learners that provided submissions
 
 
     ////USE THIS LATER ITS A SURPRISE TOOL
