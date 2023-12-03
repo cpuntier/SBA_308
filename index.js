@@ -90,7 +90,7 @@ function validateID(course, ag) {
     return true;
 }
 
-function obtainLearnerID(submissions){
+function obtainLearnerID(submissions) {
     output = []
     for (i in submissions) {
         if (!(output.indexOf(submissions[i].learner_id) !== -1)) {
@@ -101,7 +101,69 @@ function obtainLearnerID(submissions){
     return output;
 
 }
+function createResult(learnerIDArray, ag, submissions) {
+    let output = [];
+    for (let i = 0; i < learnerIDArray.length; i++) {
+        //        console.log(`Looking at ID: ${learnerIDArray[i]}`)
+        output.push(createLearnerObject(learnerIDArray[i], ag, submissions));
+    }
+    return output;
+}
 
+function createLearnerObject(learnerID, ag, submissions) {
+    let output = {}
+    output.id = learnerID;
+/**result.avg = */calculateAverage(learnerID, ag, submissions);
+    return output;
+
+}
+
+function calculateAverage(learnerID, ag, submissions) {
+    let output = {};
+    output.avg = 0;
+    let top = 0;
+    let bottom = 0;
+    let assignmentCounter = 1;
+    let submissionCounter = 1;
+    console.log(output);
+    let submitted = findSubmissions(submissions, learnerID);
+    let assignments = ag.assignments;
+    // console.log("THIS WAS SUBMITTED:::::",submitted)
+    // console.log("filter below")
+//    console.log(submitted[0]);
+ //   console.log(ag);
+    // console.log(submitted.filter((submissions) => {
+    //    return submissions.assignment_id === ag.assignments[0].id
+    // }))
+    console.log("While starts");
+    while (assignmentCounter <= assignments.length) {
+        //console.log(ag.assignments[assignmentCounter-1])
+        let submissions = submitted.filter((submissions) => {
+            return submissions.assignment_id === assignments[assignmentCounter-1].id
+         })
+         if(submissions.length === 0){
+            break;
+         }
+         console.log("HERE IS SUBMISSIONS",submissions);
+         if(assignments[assignmentCounter].due_at )
+         output[assignments[assignmentCounter-1].id] = submissions[0].submission.score/assignments[assignmentCounter-1].points_possible;
+         
+         top += submissions[0].submission.score;
+         bottom += assignments[assignmentCounter-1].points_possible;
+        assignmentCounter += 1;
+    }
+    console.log(output.avg);
+    output.avg = top/bottom;
+    console.log(output)
+}
+
+function findSubmissions(submissions, learnerID) {
+    let output = submissions.filter((submissions) => {
+        return submissions.learner_id == learnerID;
+    });
+
+    return output;
+}
 
 function getLearnerData(course, ag, submissions) {
     // here, we would process this data to achieve the desired result.
@@ -111,7 +173,7 @@ function getLearnerData(course, ag, submissions) {
 
     //first check if course id matches ag course_id
 
-    if(!validateID(course, ag)){
+    if (!validateID(course, ag)) {
         return;
     };
     let myResult = [];
@@ -121,10 +183,14 @@ function getLearnerData(course, ag, submissions) {
 
 
     let learnerIDArray = obtainLearnerID(submissions);
-    console.log(learnerIDArray);
+    //console.log(learnerIDArray);
+
+
+    myResult = createResult(learnerIDArray, ag, submissions);
+    console.log(myResult);
     //found ID's belonging to learners that provided submissions
 
-    
+
 
     ////USE THIS LATER ITS A SURPRISE TOOL
     // console.log(submissions.filter((submission) => {
