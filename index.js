@@ -130,8 +130,8 @@ function calculateAverage(learnerID, ag, submissions) {
     let assignments = ag.assignments;
     // console.log("THIS WAS SUBMITTED:::::",submitted)
     // console.log("filter below")
-//    console.log(submitted[0]);
- //   console.log(ag);
+    //    console.log(submitted[0]);
+    //   console.log(ag);
     // console.log(submitted.filter((submissions) => {
     //    return submissions.assignment_id === ag.assignments[0].id
     // }))
@@ -139,22 +139,27 @@ function calculateAverage(learnerID, ag, submissions) {
     while (assignmentCounter <= assignments.length) {
         //console.log(ag.assignments[assignmentCounter-1])
         let submissions = submitted.filter((submissions) => {
-            return submissions.assignment_id === assignments[assignmentCounter-1].id
-         })
-         if(submissions.length === 0){
+            return submissions.assignment_id === assignments[assignmentCounter - 1].id
+        })
+        if (submissions.length === 0) {
             break;
-         }
-         console.log("HERE IS SUBMISSIONS",submissions);
-         if(assignments[assignmentCounter].due_at )
-         output[assignments[assignmentCounter-1].id] = submissions[0].submission.score/assignments[assignmentCounter-1].points_possible;
-         
-         top += submissions[0].submission.score;
-         bottom += assignments[assignmentCounter-1].points_possible;
+        }
+        //         console.log("HERE IS SUBMISSIONS",submissions);
+
+        let dueDate = new Date(assignments[assignmentCounter - 1].due_at)
+        let submitDate = new Date(submissions[0].submission.submitted_at)
+
+        console.log(`Due at: ${dueDate}. Submitted at: ${submitDate}`);
+
+        output[assignments[assignmentCounter - 1].id] = submissions[0].submission.score / assignments[assignmentCounter - 1].points_possible;
+
+        top += submissions[0].submission.score;
+        bottom += assignments[assignmentCounter - 1].points_possible;
         assignmentCounter += 1;
     }
-    console.log(output.avg);
-    output.avg = top/bottom;
-    console.log(output)
+    //    console.log(output.avg);
+    output.avg = top / bottom;
+    //    console.log(output)
 }
 
 function findSubmissions(submissions, learnerID) {
