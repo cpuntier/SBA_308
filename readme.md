@@ -14,7 +14,7 @@ In this assignment I was able to
 The task was to create a script that gathers data, processes it and then outputs a consistent result as described by a specification. Here we were given three objects shown in the code and asked to parse through the objects to retrieve the data and present it in a different way.
 
 Below I will detail the functions I made and how they work.
-
+___
 ##### function validateID(course, ag)
 - validateID takes a course object and an assignment group object and returns a boolean
 - It checks to see if both of these objects have matching IDs
