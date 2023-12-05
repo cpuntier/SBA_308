@@ -107,13 +107,22 @@ function createResult(learnerIDArray, ag, submissions) {
         //        console.log(`Looking at ID: ${learnerIDArray[i]}`)
         output.push(createLearnerObject(learnerIDArray[i], ag, submissions));
     }
+    //console.log("Here is the result:",output);
     return output;
 }
 
 function createLearnerObject(learnerID, ag, submissions) {
     let output = {}
     output.id = learnerID;
-/**result.avg = */calculateAverage(learnerID, ag, submissions);
+   // console.log("Cheking ID,", output);
+    output.avg = 0;
+   // console.log("checking avg,", output)
+    let calculations = calculateAverage(learnerID, ag, submissions);
+    for(i in calculations){
+        output[i] = calculations[i];
+    }
+
+   // console.log("checking after avg", output)
     return output;
 
 }
@@ -124,42 +133,49 @@ function calculateAverage(learnerID, ag, submissions) {
     let top = 0;
     let bottom = 0;
     let assignmentCounter = 1;
-    let submissionCounter = 1;
-    console.log(output);
+    //    console.log(output);
     let submitted = findSubmissions(submissions, learnerID);
     let assignments = ag.assignments;
-    // console.log("THIS WAS SUBMITTED:::::",submitted)
-    // console.log("filter below")
-    //    console.log(submitted[0]);
-    //   console.log(ag);
-    // console.log(submitted.filter((submissions) => {
-    //    return submissions.assignment_id === ag.assignments[0].id
-    // }))
-    console.log("While starts");
+
+    //console.log("While starts");
     while (assignmentCounter <= assignments.length) {
-        //console.log(ag.assignments[assignmentCounter-1])
         let submissions = submitted.filter((submissions) => {
             return submissions.assignment_id === assignments[assignmentCounter - 1].id
         })
         if (submissions.length === 0) {
             break;
         }
-        //         console.log("HERE IS SUBMISSIONS",submissions);
 
-        let dueDate = new Date(assignments[assignmentCounter - 1].due_at)
-        let submitDate = new Date(submissions[0].submission.submitted_at)
+        let dueDate = new Date(assignments[assignmentCounter - 1].due_at + "T00:00:00")
+        let submitDate = new Date(submissions[0].submission.submitted_at + "T00:00:00")
 
-        console.log(`Due at: ${dueDate}. Submitted at: ${submitDate}`);
+        if (dueDate >= Date.now()) {
+           // console.log("DATE HASNT HAPPENED YET")
+            assignmentCounter += 1;
+            continue;
+        }
 
-        output[assignments[assignmentCounter - 1].id] = submissions[0].submission.score / assignments[assignmentCounter - 1].points_possible;
+        if (dueDate >= submitDate) {
+          //  console.log("IS ON TIME");
+            output[assignments[assignmentCounter - 1].id] = (submissions[0].submission.score / assignments[assignmentCounter - 1].points_possible).toFixed(3);
+
+        } else {
+         //   console.log("ITS LATE");
+            let deductedScore = submissions[0].submission.score - (assignments[assignmentCounter - 1].points_possible * .10)
+           // console.log("Deducted score is:",deductedScore,"Points possible is:",assignments[assignmentCounter-1].points_possible);
+            if (deductedScore < 0) {
+                output[assignments[assignmentCounter - 1].id] = 0;
+            }else{
+                output[assignments[assignmentCounter -1].id] = (deductedScore/assignments[assignmentCounter-1].points_possible).toFixed(3);
+            }
+        }
 
         top += submissions[0].submission.score;
         bottom += assignments[assignmentCounter - 1].points_possible;
         assignmentCounter += 1;
     }
-    //    console.log(output.avg);
     output.avg = top / bottom;
-    //    console.log(output)
+    return output;
 }
 
 function findSubmissions(submissions, learnerID) {
@@ -172,26 +188,19 @@ function findSubmissions(submissions, learnerID) {
 
 function getLearnerData(course, ag, submissions) {
     // here, we would process this data to achieve the desired result.
-    // console.log("ag\n", ag);
-    // console.log("course\n",course);
-    // console.log("submissions\n",submissions);
 
     //first check if course id matches ag course_id
 
     if (!validateID(course, ag)) {
         return;
     };
-    let myResult = [];
 
-    console.log("assignment group course id:", ag.course_id);
-    console.log("course id", course.id);
-
-
+    //find all the learner ids
     let learnerIDArray = obtainLearnerID(submissions);
     //console.log(learnerIDArray);
 
 
-    myResult = createResult(learnerIDArray, ag, submissions);
+    let myResult = createResult(learnerIDArray, ag, submissions);
     console.log(myResult);
     //found ID's belonging to learners that provided submissions
 
@@ -219,7 +228,7 @@ function getLearnerData(course, ag, submissions) {
         }
     ];
 
-    return result;
+    return myResult;
 }
 // 
 // const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
