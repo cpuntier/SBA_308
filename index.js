@@ -34,30 +34,30 @@ const AssignmentGroup = {
 
 // The provided learner submission data.
 const LearnerSubmissions = [
-    {
-        learner_id: 125,
-        assignment_id: 1,
-        submission: {
-            submitted_at: "2023-01-25",
-            score: 47
-        }
-    },
-    {
-        learner_id: 125,
-        assignment_id: 2,
-        submission: {
-            submitted_at: "2023-02-12",
-            score: 150
-        }
-    },
-    {
-        learner_id: 125,
-        assignment_id: 3,
-        submission: {
-            submitted_at: "2023-01-25",
-            score: 400
-        }
-    },
+    // {
+    //     learner_id: 125,
+    //     assignment_id: 1,
+    //     submission: {
+    //         submitted_at: "2023-01-25",
+    //         score: 47
+    //     }
+    // },
+    // {
+    //     learner_id: 125,
+    //     assignment_id: 2,
+    //     submission: {
+    //         submitted_at: "2023-02-12",
+    //         score: 150
+    //     }
+    // },
+    // {
+    //     learner_id: 125,
+    //     assignment_id: 3,
+    //     submission: {
+    //         submitted_at: "2023-01-25",
+    //         score: 400
+    //     }
+    // },
     {
         learner_id: 132,
         assignment_id: 1,
@@ -133,6 +133,8 @@ function calculateAverage(learnerID, ag, submissions) {
     let top = 0;
     let bottom = 0;
     let assignmentCounter = 1;
+    let deductedScore = 0;
+
     //    console.log(output);
     let submitted = findSubmissions(submissions, learnerID);
     let assignments = ag.assignments;
@@ -159,21 +161,22 @@ function calculateAverage(learnerID, ag, submissions) {
         let submitDate = new Date(submissions[0].submission.submitted_at + "T00:00:00")
 
         if (dueDate >= Date.now()) {
-            // console.log("DATE HASNT HAPPENED YET")
+            console.log("DATE HASNT HAPPENED YET")
             assignmentCounter += 1;
             continue;
         }
 
         if (dueDate >= submitDate) {
-            //  console.log("IS ON TIME");
+            console.log("IS ON TIME");
             if (assignments[assignmentCounter - 1].points_possible != 0) {
                 output[assignments[assignmentCounter - 1].id] = (submissions[0].submission.score / assignments[assignmentCounter - 1].points_possible).toFixed(3);
             }
 
         } else {
-            //   console.log("ITS LATE");
-            let deductedScore = submissions[0].submission.score - (assignments[assignmentCounter - 1].points_possible * .10)
-            // console.log("Deducted score is:",deductedScore,"Points possible is:",assignments[assignmentCounter-1].points_possible);
+            console.log("ITS LATE");
+            console.log("original score is", submissions[0].submission.score);
+            deductedScore = submissions[0].submission.score - (assignments[assignmentCounter - 1].points_possible * .10)
+            console.log("Deducted score is:", deductedScore, "Points possible is:", assignments[assignmentCounter - 1].points_possible);
             if (deductedScore < 0) {
                 output[assignments[assignmentCounter - 1].id] = 0;
             } else {
@@ -183,8 +186,13 @@ function calculateAverage(learnerID, ag, submissions) {
             }
         }
 
-        top += submissions[0].submission.score;
+        if (!deductedScore) {
+            top += submissions[0].submission.score;
+        }else{
+            top += deductedScore;
+        }
         bottom += assignments[assignmentCounter - 1].points_possible;
+        console.log("top:", top, "\nbottom:", bottom)
         assignmentCounter += 1;
     }
     output.avg = top / bottom;
