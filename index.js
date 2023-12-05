@@ -99,8 +99,8 @@ function obtainLearnerID(submissions) {
         }
     }
     return output;
-
 }
+
 function createResult(learnerIDArray, ag, submissions) {
     let output = [];
     for (let i = 0; i < learnerIDArray.length; i++) {
@@ -142,11 +142,20 @@ function calculateAverage(learnerID, ag, submissions) {
         let submissions = submitted.filter((submissions) => {
             return submissions.assignment_id === assignments[assignmentCounter - 1].id
         })
-        if (submissions.length === 0) {
-            break;
-        }
 
-        let dueDate = new Date(assignments[assignmentCounter - 1].due_at + "T00:00:00")
+        let dueDate = new Date(assignments[assignmentCounter - 1].due_at + "T00:00:00");
+
+
+        if (submissions.length === 0) {
+           // console.log("Learner did not submit anything for this assignment");
+            if (dueDate <= Date.now()){
+                output[assignments[assignmentCounter-1].id] = 0;
+                top += 0;
+                bottom +=assignments[assignmentCounter - 1].points_possible;
+            }
+            assignmentCounter += 1;
+            continue;
+        }
         let submitDate = new Date(submissions[0].submission.submitted_at + "T00:00:00")
 
         if (dueDate >= Date.now()) {
